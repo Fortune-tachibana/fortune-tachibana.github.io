@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link rel="stylesheet" href="css/style.css"> <!-- ← 統一CSSを読み込み -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>人相占い | 占いの館</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+</head>
+<body>
+
+  <!-- 背景エフェクト -->
+  <div id="clouds"></div>
+  <canvas id="starCanvas"></canvas>
+
+  <div class="container">
+    <h1>人相占い</h1>
+    <audio id="bgm" src="healing_music.mp3" loop></audio>
+    <form id="fortune-form" class="form-section">
+      <div class="input-group">
+        <label for="lastName">LastName</label>
+        <input type="text" id="lastName" required>
+    
+        <label for="firstName">FirstName</label>
+        <input type="text" id="firstName" required>
+    
+        <label for="birthDate">BirthDay</label>
+        <input type="date" id="birthDate" required>
+    
+        <label>FacePhoto</label>
+        <input type="file" id="facePhoto" accept="image/*" required>
+        <div id="facePreviewContainer" style="margin-top:10px;">
+          <img id="previewFace" style="max-width: 300px; height: auto; display: none; border: 1px solid #ccc; padding: 5px; border-radius: 8px;">
+        </div>
+      </div>
+    
+      
+      <!-- 占うボタン -->
+      <div class="submit-button-wrapper">
+        <button type="submit">占う</button>
+      </div>
+    </form>
+    
+    <!-- ローディング画面 -->
+    <div id="loadingScreen" style="display:none;">
+      <div id="crystalBallWrapper">
+        <canvas id="crystalBallCanvas"></canvas>
+        <img id="starOverlay" src="images/star.png" alt="星模様" />
+      </div>
+      <p class="loading-text">未来を視ています…</p>
+    </div>
+
+    <!-- 結果カード -->
+    <div id="fortuneCard" class="card" style="display:none;">
+      <div class="card-front">
+        <p>あなたの運命は…</p>
+      </div>
+      <div class="card-back">
+        <p id="fortuneMessage">占い結果がここに表示されます</p>
+      </div>
+    </div>
+
+    <!-- チャート -->
+    <canvas id="fortuneChart" width="300" height="300"></canvas>
+    <p id="personalityMessage" class="personality-box" style="display: none;"></p>
+    
+
+
+    <!-- ラッキーアイテム -->
+    <p id="luckyItem"></p>
+
+    <div id="testimonialBox" class="testimonial-box" style="display:none;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <button id="saveImageBtn">結果を画像として保存</button>
+
+    <p id="fortuneRank"></p>
+
+
+    <!-- シェアボタン -->
+    <div id="share-buttons">
+      <a id="twitter-share" href="#" target="_blank">Twitterでシェア</a>
+      <a id="line-share" href="#" target="_blank">LINEでシェア</a>
+    </div>
+
+    <!-- 詳細占いボタン -->
+    <div class="details-button-container">
+      <a href="https://lin.ee/YtBmRMl" target="_blank" class="details-button">🔮 無料でさらに詳しく占う</a>
+    </div>
+
+
+    <!-- Googleフォーム送信用 -->
+    <form id="googleForm"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSf05PBSdvXsEY-aH2LaNduFnhUitO8BjYUZFwylRS8K8HeKpw/formResponse"
+      method="POST"
+      target="hidden_iframe"
+      style="display:none;">
+      <input type="hidden" name="entry.988363629" id="g-lastName">
+      <input type="hidden" name="entry.2100239727" id="g-firstName">
+      <input type="hidden" name="entry.2112033782" id="g-birthDate">
+      <input type="hidden" name="entry.1713472671" id="g-deviceInfo">
+    </form>
+    <iframe name="hidden_iframe" style="display:none;"></iframe>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://ewsgfxsfbosxomeulkuk.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3c2dmeHNmYm9zeG9tZXVsa3VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MDc1OTIsImV4cCI6MjA2MTA4MzU5Mn0.Xqyo2zYTIq1JH6a1n3VPqKRRsf6hhiwKQvwK-QbZ-mg';
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    document.getElementById("fortune-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const lastName = document.getElementById("lastName").value.trim();
+      const firstName = document.getElementById("firstName").value.trim();
+      const birthDate = document.getElementById("birthDate").value;
+      const file = document.getElementById("facePhoto").files[0];
+      const fileName = `face_${Date.now()}.jpg`;
+
+      if (file) {
+        const { data, error } = await supabaseClient.storage
+          .from('uploads')
+          .upload(`faces/${fileName}`, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (error) {
+          alert("写真のアップロードに失敗しました。");
+          console.error(error);
+          return;
+        }
+      }
+
+      document.getElementById("g-lastName").value = lastName;
+      document.getElementById("g-firstName").value = firstName;
+      document.getElementById("g-birthDate").value = birthDate;
+      document.getElementById("g-deviceInfo").value = navigator.userAgent;
+
+      document.getElementById("googleForm").submit();
+
+      const userData = `${lastName}-${firstName}-${birthDate}-${birthTime}-${navigator.userAgent}`;
+      const seed = hashCode(userData);
+      const ratings = generateRatings(seed);
+      const message = generateMessage(seed);
+      showChart(ratings);
+      document.getElementById("fortuneMessage").innerText = message;
+    });
+
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    }
+
+    function generateRatings(seed) {
+      const random = (n) => (Math.floor((Math.sin(seed++) * 10000) % 5) + 1);
+      return ["金運", "恋愛運", "仕事運", "健康運", "全体運"].map(() => random(seed));
+    }
+
+    function generateMessage(seed) {
+      const messages = [
+        "今日は新しいことを始めるのに最適な日！",
+        "ちょっと休憩が運気アップのカギ。",
+        "笑顔が幸運を引き寄せます。",
+        "人との出会いがチャンスを運びます。",
+        "慎重さが功を奏す日です。"
+      ];
+      return messages[seed % messages.length];
+    }
+
+    function showChart(data) {
+      const ctx = document.getElementById('fortuneChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['金運', '恋愛運', '仕事運', '健康運', '全体運'],
+          datasets: [{
+            label: '占い結果',
+            data: data,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: '#fff',
+            pointBackgroundColor: '#fff'
+          }]
+        },
+        options: {
+          scales: {
+            r: {
+              suggestedMin: 0,
+              suggestedMax: 5,
+              pointLabels: { color: '#fff' },
+              grid: { color: '#aaa' },
+              angleLines: { color: '#aaa' }
+            }
+          }
+        }
+      });
+    }
+  </script>
+  <!-- スクリプト -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>
