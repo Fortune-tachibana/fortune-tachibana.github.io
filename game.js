@@ -4,9 +4,17 @@ const bgmEnabled = urlParams.get("bgm") === "1" || localStorage.getItem("playBGM
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+
+// スマホや高解像度ディスプレイでの画質改善
+const dpr = window.devicePixelRatio || 1;  // デバイスピクセル比
+canvas.width = window.innerWidth * dpr;
+canvas.height = window.innerHeight * dpr;
+canvas.style.width = `${window.innerWidth}px`;
+canvas.style.height = `${window.innerHeight}px`;
+
+// 高解像度ディスプレイでも鮮明に描画するための設定
+ctx.scale(dpr, dpr);
+ctx.imageSmoothingEnabled = true; // 画像をスムーズに補完
 
 const bgm = document.getElementById("bgm");
 const seCatch = document.getElementById("se-catch");
