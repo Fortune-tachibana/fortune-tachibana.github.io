@@ -1,95 +1,110 @@
-body, html, canvas {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  font-family: sans-serif;
+  font-family: 'Helvetica Neue', sans-serif;
+  color: white;
+  background: #000;
 }
 
-.center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+canvas#background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.fog-layer {
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05), transparent 60%),
+              radial-gradient(circle at 30% 70%, rgba(255,255,255,0.04), transparent 60%);
+  animation: fogMove 60s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes fogMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-20%, -10%); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
   text-align: center;
+  padding: 50px 20px;
 }
 
-.character-select {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
+header h1, .section h2 {
+  color: #b19cd9;
+}
+
+.intro {
+  font-size: 1.2em;
   margin: 20px 0;
 }
 
-.character-select div {
-  cursor: pointer;
+.section {
+  margin: 50px 0;
 }
 
-.character-select img {
-  width: 100px;
-  height: auto;
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-#game-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-}
-
-#hud {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: #fff;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px #000;
-  z-index: 2;
-}
-
-#hud div {
-  margin-bottom: 5px;
-  font-size: 1em;
-}
-
-#gameCanvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-#result {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2em;
-  border-radius: 10px;
-  text-align: center;
-  z-index: 10;
-}
-
-#result.hidden {
-  display: none;
-}
-
-#result button {
-  margin-top: 1em;
-  padding: 0.7em 1.5em;
-  font-size: 1em;
-  background-color: #4CAF50;
+/* Button styling */
+.btn {
+  padding: 15px 30px;
+  background: linear-gradient(135deg, #432889, #a87ecd);
   color: white;
-  border: none;
+  text-decoration: none;
+  font-weight: bold;
   border-radius: 8px;
-  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(170, 136, 255, 0.3);
+  transition: 0.3s ease all;
 }
 
-#result button:hover {
-  background-color: #45a049;
+.btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 70%);
+  animation: pulse 3s infinite;
+  pointer-events: none;
+}
+
+.btn:hover {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  transform: scale(1.05);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(10%, 10%) scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.contact-btn {
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+}
+
+.contact-btn:hover {
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
 }
