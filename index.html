@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>占いトップページ</title>
   <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="star.ico">
+  <link rel="icon" href="star.ico">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1873359578159316"
      crossorigin="anonymous"></script>
 </head>
@@ -33,6 +33,12 @@
       </div>
     </section>
 
+<div id="dailyFortuneBox" class="daily-fortune-box">
+  <h2>本日の運勢</h2>
+  <p id="dailyFortuneMessage">読み込み中...</p>
+</div>
+
+
     <section class="section">
       <h2>詳しく占ってほしい方はこちら</h2>
       <a href="https://lin.ee/YtBmRMl" class="btn contact-btn">お問い合わせ</a>
@@ -41,5 +47,30 @@
 
   
   <script src="background.js"></script>
+
+  <script>
+  const fortunes = [
+    "今日は運気が最高！新しいことに挑戦してみましょう。",
+    "落ち着いて行動すれば、良い結果が得られそうです。",
+    "大切な人との会話が運気を高めます。",
+    "予想外のチャンスが訪れるかも。準備は万端に。",
+    "感情のコントロールが鍵。自分のペースを大切に。",
+    "過去の努力が実を結ぶ日になりそうです。",
+    "リラックスがテーマ。無理をせず自分を癒しましょう。"
+  ];
+
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate(); // 例: 20250512
+  const index = seed % fortunes.length;
+
+  document.getElementById("dailyFortuneMessage").innerText = fortunes[index];
+</script>
+<style>
+  html, body {
+    height: auto !important;
+    overflow: auto !important;
+  }
+</style>
+
 </body>
 </html>

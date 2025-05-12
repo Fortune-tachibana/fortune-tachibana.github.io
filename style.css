@@ -108,3 +108,53 @@ header h1, .section h2 {
 .contact-btn:hover {
   background: linear-gradient(45deg, #ff1493, #ff69b4);
 }
+.daily-fortune-box {
+  background-color: #3e375c;
+  border: 2px solid #d4c1a3;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.daily-fortune-box h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+  color: #9a7c4d;
+}
+
+  .daily-fortune-box {
+    max-width: 90%;
+    width: 320px;
+    margin: 20px auto;
+    padding: 16px;
+    background-color: #281f52;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .daily-fortune-box h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+
+  .daily-fortune-box p {
+    font-size: 1em;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 480px) {
+    .daily-fortune-box {
+      width: 90%;
+      padding: 12px;
+    }
+
+    .daily-fortune-box h2 {
+      font-size: 1.1em;
+    }
+
+    .daily-fortune-box p {
+      font-size: 0.95em;
+    }
+  }
